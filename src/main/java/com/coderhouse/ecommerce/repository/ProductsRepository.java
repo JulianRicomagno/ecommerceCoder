@@ -7,6 +7,5 @@ import com.coderhouse.ecommerce.entity.Product;
 @Repository
 public interface ProductsRepository extends JpaRepository<Product, Long> {
 
-    // Puedes agregar métodos personalizados aquí si es necesario
 }
 

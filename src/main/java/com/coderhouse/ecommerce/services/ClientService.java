@@ -8,4 +8,5 @@ public interface ClientService {
     Client save(Client client);
     Client findById(Long id);
     void delete(Client client);
+    Client findByDocnumber(String docnumber);
 }
