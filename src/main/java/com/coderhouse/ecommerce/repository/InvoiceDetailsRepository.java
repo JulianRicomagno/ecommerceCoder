@@ -7,5 +7,4 @@ import com.coderhouse.ecommerce.entity.InvoiceDetail;
 @Repository
 public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetail, Long> {
 
-    // Puedes agregar métodos personalizados aquí si es necesario
 }

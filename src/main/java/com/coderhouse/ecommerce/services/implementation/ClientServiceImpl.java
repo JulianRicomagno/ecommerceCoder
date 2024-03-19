@@ -32,5 +32,10 @@ public class ClientServiceImpl implements ClientService {
     public void delete(Client client) {
         clientDao.delete(client);
     }
+
+    @Override
+    public Client findByDocnumber(String docnumber) {
+        return clientDao.findByDocnumber(docnumber);
+    }
 }
 

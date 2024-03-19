@@ -7,5 +7,5 @@ import com.coderhouse.ecommerce.entity.Client;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-    // Puedes agregar métodos personalizados aquí si es necesario
+    Client findByDocnumber(String docnumber);
 }
