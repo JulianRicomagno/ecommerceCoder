@@ -1,6 +1,7 @@
 package com.coderhouse.ecommerce.services.implementation;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.coderhouse.ecommerce.entity.Product;
@@ -31,5 +32,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(Product product) {
         productDao.delete(product);
+    }
+
+    @Override
+    public Product findByCode(String code) {
+        return productDao.findByCode(code);
     }
 }

@@ -1,96 +1,89 @@
 package com.coderhouse.ecommerce.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.coderhouse.ecommerce.entity.Product;
+import com.coderhouse.ecommerce.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.coderhouse.ecommerce.entity.Product;
-import com.coderhouse.ecommerce.services.ProductService;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/products")
 public class ProductController {
 
     @Autowired
     private ProductService productService;
 
-    @GetMapping("/products")
-    public ResponseEntity<Object> getAllProducts() {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            List<Product> products = productService.findAll();
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    // Crear un producto
+    @PostMapping
+    public ResponseEntity<?> createProduct(@RequestBody Product product) {
+        // Verificar si el código ya existe
+        if (productService.findByCode(product.getCode()) != null) {
+            return new ResponseEntity<>("El código del producto ya existe", HttpStatus.BAD_REQUEST);
         }
+        Product createdProduct = productService.save(product);
+        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
-    @GetMapping("/products/{id}")
-    public ResponseEntity<Object> getProductById(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Product product = productService.findById(id);
-            return new ResponseEntity<>(product, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+    // GET de todos los productos
+    @GetMapping
+    public ResponseEntity<List<Product>> getAllProducts() {
+        List<Product> products = productService.findAll();
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
-    @PostMapping("/products")
-    public ResponseEntity<Object> createProduct(@RequestBody Product product) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Product createdProduct = productService.save(product);
-            return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    // GET de producto por code
+    @GetMapping("/code/{code}")
+    public ResponseEntity<Product> getProductByCode(@PathVariable String code) {
+        Product product = productService.findByCode(code);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    @PutMapping("/products/{id}")
-    public ResponseEntity<Object> updateProduct(@RequestBody Product product, @PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Product existingProduct = productService.findById(id);
-            existingProduct.setDescription(product.getDescription());
-            existingProduct.setCode(product.getCode());
-            existingProduct.setStock(product.getStock());
-            existingProduct.setPrice(product.getPrice());
-
-            Product updatedProduct = productService.save(existingProduct);
-            return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    // GET de producto por id
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        Product product = productService.findById(id);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    @DeleteMapping("/products/{id}")
-    public ResponseEntity<Object> deleteProduct(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Product product = productService.findById(id);
-            productService.delete(product);
-            response.put("deleted", true);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    // PUT de description, stock, price segun lo que se envia que puede ser todo uno o dos
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+        Product existingProduct = productService.findById(id);
+        if (existingProduct == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // Actualizar solo los campos que se envían en el cuerpo de la solicitud
+        if (updatedProduct.getDescription() != null) {
+            existingProduct.setDescription(updatedProduct.getDescription());
+        }
+        if (updatedProduct.getStock() != null) {
+            existingProduct.setStock(updatedProduct.getStock());
+        }
+        if (updatedProduct.getPrice() != null) {
+            existingProduct.setPrice(updatedProduct.getPrice());
+        }
+        Product savedProduct = productService.save(existingProduct);
+        return new ResponseEntity<>(savedProduct, HttpStatus.OK);
+    }
+
+    // DELETE de producto
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        Product product = productService.findById(id);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        productService.delete(product);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
