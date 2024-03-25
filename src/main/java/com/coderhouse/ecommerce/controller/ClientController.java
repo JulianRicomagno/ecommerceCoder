@@ -9,24 +9,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.coderhouse.ecommerce.entity.Client;
-import com.coderhouse.ecommerce.services.ClientService;
+import com.coderhouse.ecommerce.services.implementation.ClientServiceImpl;
+
 
 @RestController
 @RequestMapping("/api/clients")
 public class ClientController {
 
     @Autowired
-    private ClientService clientService;
+    private ClientServiceImpl clientService;
 
     @PostMapping
     public ResponseEntity<String> createClient(@RequestBody Client client) {
-        Client existingClient = clientService.findByDocnumber(client.getDocnumber());
-        if (existingClient != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya se encuentra creado un usuario con ese DNI");
+        try {
+            Client savedClient = clientService.save(client);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Cliente creado exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al crear el cliente: " + e.getMessage());
         }
-        Client savedClient = clientService.save(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Cliente creado exitosamente");
     }
+
 
 
     @GetMapping
