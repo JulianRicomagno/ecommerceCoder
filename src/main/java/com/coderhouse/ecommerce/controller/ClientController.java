@@ -9,63 +9,91 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.coderhouse.ecommerce.entity.Client;
-import com.coderhouse.ecommerce.services.ClientService;
+import com.coderhouse.ecommerce.services.implementation.ClientServiceImpl;
+
 
 @RestController
 @RequestMapping("/api/clients")
 public class ClientController {
 
     @Autowired
-    private ClientService clientService;
+    private ClientServiceImpl clientService;
 
     @PostMapping
-    public ResponseEntity<String> createClient(@RequestBody Client client) {
-        Client existingClient = clientService.findByDocnumber(client.getDocnumber());
-        if (existingClient != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya se encuentra creado un usuario con ese DNI");
+    public ResponseEntity<?> createClient(@RequestBody Client client) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Client savedClient = clientService.save(client);
+            res.put("succes", true);
+            res.put("message", "Cliente creado exitosamente");
+            res.put("data", savedClient);
+            return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        } catch (Exception e) {
+            res.put("succes", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
-        Client savedClient = clientService.save(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Cliente creado exitosamente");
     }
 
-
     @GetMapping
-    public ResponseEntity<List<Client>> getAllClients() {
-        List<Client> clients = clientService.findAll();
-        return ResponseEntity.ok(clients);
+    public ResponseEntity<?> getAllClients() {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            List<Client> clients = clientService.findAll();
+            res.put("succes", true);
+            res.put("data", clients);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } catch (Exception e) {
+            res.put("succes", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientById(@PathVariable Long id) {
-        Client client = clientService.findById(id);
-        if (client != null) {
-            return ResponseEntity.ok(client);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getClientById(@PathVariable Long id) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Client client = clientService.getClientById(id);
+            res.put("succes", true);
+            res.put("data", client);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } catch (Exception e) {
+            res.put("succes", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> updateClientNameAndLastName(@PathVariable Long id, @RequestBody Client updatedClient) {
-        Client existingClient = clientService.findById(id);
-        if (existingClient != null) {
-            existingClient.setName(updatedClient.getName());
-            existingClient.setLastname(updatedClient.getLastname());
-            Client savedClient = clientService.save(existingClient);
-            return ResponseEntity.ok(savedClient);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateClientNameAndLastName(@PathVariable Long id, @RequestBody Client updatedClient) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Client client = clientService.updateClient(id, updatedClient);
+            res.put("succes", true);
+            res.put("message", "Cliente actualizado exitosamente");
+            res.put("data", client);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } catch (Exception e) {
+            res.put("succes", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
-        Client client = clientService.findById(id);
-        if (client != null) {
-            clientService.delete(client);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> deleteClient(@PathVariable Long id) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Client client = clientService.deleteClient(id);
+            res.put("succes", true);
+            res.put("message", "Cliente borrado exitosamente");
+            res.put("data", client);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } catch (Exception e) {
+            res.put("succes", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
 }
