@@ -35,6 +35,7 @@ public class ClientController {
         }
     }
 
+
     @GetMapping
     public ResponseEntity<?> getAllClients() {
         Map<String, Object> res = new HashMap<>();

@@ -23,6 +23,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client save(Client client) {
+        Client existingClient = this.findByDocnumber(client.getDocnumber());
+        if (existingClient != null) {
+            throw new ClientException.ClientAlreadyExistsException(client.getDocnumber());
+        }
         return clientDao.save(client);
     }
 
