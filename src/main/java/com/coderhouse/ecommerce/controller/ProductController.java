@@ -1,8 +1,11 @@
 package com.coderhouse.ecommerce.controller;
 
+import jakarta.validation.Valid;
 import com.coderhouse.ecommerce.entity.Product;
-import com.coderhouse.ecommerce.services.ProductService;
+import com.coderhouse.ecommerce.services.implementation.ProductServiceImpl;
+import com.coderhouse.ecommerce.response.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,76 +17,77 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
-    // Crear un producto
+    @Autowired
+    private ResponseFactory responseFactory;
+
+    //Create a product
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody Product product) {
-        // Verificar si el código ya existe
-        if (productService.findByCode(product.getCode()) != null) {
-            return new ResponseEntity<>("El código del producto ya existe", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> createProduct(@Valid @RequestBody Product product, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return responseFactory.createResponse(null, "Revise la informacion enviada que no es correcta", HttpStatus.BAD_REQUEST);
         }
-        Product createdProduct = productService.save(product);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+        try {
+            Product createdProduct = productService.saveProduct(product);
+            return responseFactory.createResponse(createdProduct, "Producto creado exitosamente", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-
-    // GET de todos los productos
+    //GET all products
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.findAll();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+    public ResponseEntity<?> getAllProducts() {
+        try {
+            List<Product> products = productService.findAll();
+            return responseFactory.createResponse(products, null, HttpStatus.OK);
+        } catch (Exception e) {
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    // GET de producto por code
+    //GET product by code
     @GetMapping("/code/{code}")
-    public ResponseEntity<Product> getProductByCode(@PathVariable String code) {
-        Product product = productService.findByCode(code);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> getProductByCode(@PathVariable String code) {
+        try {
+            Product product = productService.getProductByCode(code);
+            return responseFactory.createResponse(product, null, HttpStatus.OK);
+        } catch (Exception e) {
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    // GET de producto por id
+    //GET product by id
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Product product = productService.findById(id);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+        try {
+            Product product = productService.getProductById(id);
+            return responseFactory.createResponse(product, null, HttpStatus.OK);
+        } catch (Exception e) {
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    // PUT de description, stock, price segun lo que se envia que puede ser todo uno o dos
+    //PUT a product
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
-        Product existingProduct = productService.findById(id);
-        if (existingProduct == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+        try {
+            Product product = productService.updateProduct(id, updatedProduct);
+            return responseFactory.createResponse(product, "Producto actualizado exitosamente", HttpStatus.OK);
+        } catch (Exception e) {
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        // Actualizar solo los campos que se envían en el cuerpo de la solicitud
-        if (updatedProduct.getDescription() != null) {
-            existingProduct.setDescription(updatedProduct.getDescription());
-        }
-        if (updatedProduct.getStock() != null) {
-            existingProduct.setStock(updatedProduct.getStock());
-        }
-        if (updatedProduct.getPrice() != null) {
-            existingProduct.setPrice(updatedProduct.getPrice());
-        }
-        Product savedProduct = productService.save(existingProduct);
-        return new ResponseEntity<>(savedProduct, HttpStatus.OK);
     }
 
-    // DELETE de producto
+    //DELETE a product
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        Product product = productService.findById(id);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        try {
+            Product product = productService.deleteProduct(id);
+            return responseFactory.createResponse(product, "Producto borrado exitosamente", HttpStatus.OK);
+        } catch (Exception e) {
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        productService.delete(product);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
