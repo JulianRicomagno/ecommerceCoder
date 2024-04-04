@@ -113,7 +113,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         for (Invoice myInvoice: targetInvoices) {
             List<InvoiceDetail> InvoiceDetail = invoiceDetailsService.findByInvoice(myInvoice);
             responseDetail.add(this.getInvoiceSaved(myInvoice, InvoiceDetail));
-            //return this.getInvoiceSaved(targetInvoice, InvoiceDetail);
         }
         return responseDetail;
     }
