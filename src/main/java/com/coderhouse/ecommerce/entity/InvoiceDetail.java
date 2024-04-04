@@ -2,19 +2,21 @@ package com.coderhouse.ecommerce.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "invoice_details")
 public class InvoiceDetail implements Serializable {
 
-    @ManyToOne
-    @JoinColumn(name = "invoice_id", referencedColumnName = "id")
-    private Invoice invoice;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "invoice_detail_id")
-    private Long invoiceDetailId;
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "invoice_id", referencedColumnName = "id")
+    private Invoice invoice;
 
     @Column(name = "amount")
     private Integer amount;
@@ -36,11 +38,11 @@ public class InvoiceDetail implements Serializable {
     }
 
     public Long getInvoiceDetailId() {
-        return invoiceDetailId;
+        return id;
     }
 
     public void setInvoiceDetailId(Long invoiceDetailId) {
-        this.invoiceDetailId = invoiceDetailId;
+        this.id = invoiceDetailId;
     }
 
     public Integer getAmount() {
@@ -65,5 +67,14 @@ public class InvoiceDetail implements Serializable {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Map<String, Object> getInvoiceDetail() {
+        Map<String, Object> invoiceDetail = new HashMap<>();
+        invoiceDetail.put("productCode", this.product.getCode());
+        invoiceDetail.put("productDescription", this.product.getDescription());
+        invoiceDetail.put("amount", this.amount);
+        invoiceDetail.put("price", this.price);
+        return invoiceDetail;
     }
 }
