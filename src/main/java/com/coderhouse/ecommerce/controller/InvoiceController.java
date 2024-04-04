@@ -1,93 +1,60 @@
 package com.coderhouse.ecommerce.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coderhouse.ecommerce.response.ResponseFactory;
 import com.coderhouse.ecommerce.entity.Invoice;
-import com.coderhouse.ecommerce.services.InvoiceService;
+import com.coderhouse.ecommerce.entity.requestBody.RequestInvoice;
+import com.coderhouse.ecommerce.services.implementation.InvoiceServiceImpl;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/invoices")
 public class InvoiceController {
 
     @Autowired
-    private InvoiceService invoiceService;
+    private InvoiceServiceImpl invoiceService;
 
-    @GetMapping("/invoices")
-    public ResponseEntity<Object> getAllInvoices() {
-        Map<String, Object> response = new HashMap<>();
+    @Autowired
+    private ResponseFactory responseFactory;
+
+    @GetMapping
+    public ResponseEntity<?> getAllInvoices() {
         try {
-            List<Invoice> invoices = invoiceService.findAll();
-            return new ResponseEntity<>(invoices, HttpStatus.OK);
+            List<Map<String, Object>> invoices = invoiceService.getAll();
+            return responseFactory.createResponse(invoices, null, HttpStatus.OK);
         } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping("/invoices/{id}")
-    public ResponseEntity<Object> getInvoiceById(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getInvoiceById(@PathVariable Long id) {
         try {
-            Invoice invoice = invoiceService.findById(id);
-            return new ResponseEntity<>(invoice, HttpStatus.OK);
+            Map<String, Object> savedInvoice = invoiceService.getInvoiceById(id);
+            return responseFactory.createResponse(savedInvoice, null, HttpStatus.OK);
         } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PostMapping("/invoices")
-    public ResponseEntity<Object> createInvoice(@RequestBody Invoice invoice) {
-        Map<String, Object> response = new HashMap<>();
+    @PostMapping
+    public ResponseEntity<?> createInvoice(@RequestBody RequestInvoice invoice) {
         try {
-            Invoice createdInvoice = invoiceService.save(invoice);
-            return new ResponseEntity<>(createdInvoice, HttpStatus.CREATED);
+            Map<String, Object> savedInvoice = invoiceService.saveInvoice(invoice);
+            return responseFactory.createResponse(savedInvoice, "Factura creada exitosamente", HttpStatus.CREATED);
         } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return responseFactory.createResponse(null, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/invoices/{id}")
-    public ResponseEntity<Object> updateInvoice(@RequestBody Invoice invoice, @PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Invoice existingInvoice = invoiceService.findById(id);
-            // Actualizar los campos necesarios de existingInvoice con los valores de invoice
-
-            Invoice updatedInvoice = invoiceService.save(existingInvoice);
-            return new ResponseEntity<>(updatedInvoice, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @DeleteMapping("/invoices/{id}")
-    public ResponseEntity<Object> deleteInvoice(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Invoice invoice = invoiceService.findById(id);
-            invoiceService.delete(invoice);
-            response.put("deleted", true);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }
