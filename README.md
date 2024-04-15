@@ -18,7 +18,7 @@ El proyecto utiliza las siguientes tecnologías y dependencias:
 
 Para descargar y configurar el proyecto desde GitHub, sigue estos pasos:
 
-1. Clona el repositorio desde GitHub: `git clone <URL_del_repositorio>`
+1. Clona el repositorio desde GitHub: `git clone <[URL_del_repositorio](https://github.com/JulianRicomagno/ecommerceCoder.git)>`
 2. Abre el proyecto en tu IDE preferido.
 3. Configura el archivo `application.properties` con los detalles de tu base de datos MySQL.
 
