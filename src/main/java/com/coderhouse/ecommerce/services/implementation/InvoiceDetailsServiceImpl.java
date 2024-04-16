@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.coderhouse.ecommerce.entity.Client;
 import com.coderhouse.ecommerce.entity.Invoice;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.coderhouse.ecommerce.repository.InvoiceDetailsRepository;
 import com.coderhouse.ecommerce.services.InvoiceDetailsService;
 
 @Service
+@Hidden
 public class InvoiceDetailsServiceImpl implements InvoiceDetailsService {
 
     @Autowired

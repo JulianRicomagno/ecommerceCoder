@@ -7,6 +7,7 @@ import com.coderhouse.ecommerce.entity.Product;
 import com.coderhouse.ecommerce.entity.requestBody.Detail;
 import com.coderhouse.ecommerce.entity.requestBody.RequestInvoice;
 import com.coderhouse.ecommerce.exception.InvoiceException;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.coderhouse.ecommerce.entity.Invoice;
@@ -14,6 +15,7 @@ import com.coderhouse.ecommerce.repository.InvoiceRepository;
 import com.coderhouse.ecommerce.services.InvoiceService;
 
 @Service
+@Hidden
 public class InvoiceServiceImpl implements InvoiceService {
 
     @Autowired

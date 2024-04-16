@@ -1,6 +1,8 @@
 package com.coderhouse.ecommerce.services.implementation;
 
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.coderhouse.ecommerce.entity.Client;
@@ -9,6 +11,7 @@ import com.coderhouse.ecommerce.services.ClientService;
 import com.coderhouse.ecommerce.exception.ClientException;
 
 @Service
+@Hidden
 public class ClientServiceImpl implements ClientService {
 
     @Autowired

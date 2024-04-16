@@ -3,6 +3,7 @@ package com.coderhouse.ecommerce.services.implementation;
 import java.util.List;
 
 import com.coderhouse.ecommerce.exception.ProductException;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.coderhouse.ecommerce.entity.Product;
@@ -16,6 +17,7 @@ import jakarta.validation.ValidatorFactory;
 import java.util.Set;
 
 @Service
+@Hidden
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
